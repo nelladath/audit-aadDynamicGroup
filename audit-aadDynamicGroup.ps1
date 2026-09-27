@@ -1,6 +1,6 @@
 ##########################################################################
 
-#AuditDynamicGroup.ps1
+#audit-aadDynamicGroup.ps1
 
 #Author: Sujin Nelladath
 
