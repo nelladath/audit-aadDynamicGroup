@@ -1,4 +1,4 @@
-﻿##########################################################################
+##########################################################################
 
 #AuditDynamicGroup.ps1
 
@@ -47,6 +47,23 @@ $statusUri = "https://graph.microsoft.com/beta/groups/$($group.id)?`$select=memb
 $data = Invoke-MgGraphRequest -Method GET -Uri $statusUri 
 $s = $data.membershipRuleProcessingStatus
 
+
+# Get Member Count
+try
+{
+    $memberUri = "https://graph.microsoft.com/v1.0/groups/$($group.id)/members/`$count"
+    
+    $memberCount = (Invoke-MgGraphRequest `
+        -Method GET `
+        -Uri $memberUri `
+        -Headers @{ConsistencyLevel="eventual"})
+}
+catch
+{
+    $memberCount = "Unable to retrieve"
+}
+
+
 $result = [PSCustomObject]@{
     GroupName             = $group.displayName
     GroupId               = $group.id
@@ -54,6 +71,7 @@ $result = [PSCustomObject]@{
     StatusDetails         = if ($s.statusDetails) { $s.statusDetails } else { 'N/A' }
     LastMembershipUpdated = if ($s.lastMembershipUpdated) { $s.lastMembershipUpdated } else { 'N/A' }
     RuleEvaluationStatus  = if ($s.membershipRuleEvaluationStatus) { $s.membershipRuleEvaluationStatus } else { 'N/A' }
+    MemberCount           = $memberCount
     CheckedAt             = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
 }
 
